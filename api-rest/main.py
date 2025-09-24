@@ -1,6 +1,8 @@
-from typing import Union
+from typing import Dict, Optional, Union
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+
 
 app = FastAPI()
 
@@ -121,8 +123,38 @@ def read_root():
 def get_objects(id_list):
     if id_list is None:
         return objects_json
-    filtered_objects = [obj for obj in objects_json if obj["id"] in id_list] 
-    #con esto devuelvo un ID si y solo si esta en la lista 
+    filtered_objects = [obj for obj in objects_json if obj["id"] in id_list] #con esto devuelvo un ID si y solo si esta en la lista 
     return filtered_objects
 
+@app.get("/objects/{obj_id}")
+def get_objetcts(obj_id):
+    for obj in objects_json:
+        if obj["id"] == obj_id:
+            return obj
+    raise HTTPException(status_code=404, detail=f"objeto {obj_id} no existe")
+    
+class ObjetctData(BaseModel):
+    pass
+    class Config:
+            extra = "allow"
 
+class CreateObjectRequest(BaseModel):
+     name: str
+     data: Optional [Dict{str, Any}] = None
+
+class CreateObjectRequest(BaseModel):
+     id: str
+     name: str
+     data: Optional [Dict{str, Any}] = None
+
+@app.post("/objects")
+def add_object(obj: CreateObjectRequest):
+     #chequear si el id existe
+     ids = [int(obj["id"]) for obj in objects_json]
+     new_id = str (max(ids)+1) if ids else "1"
+
+     new_obj = {"id":  new_id, "name":obj.name, "data" : obj.data}
+
+     objects_json.append(obj)
+
+     return new_obj
