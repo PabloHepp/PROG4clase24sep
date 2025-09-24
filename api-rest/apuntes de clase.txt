@@ -1,0 +1,16 @@
+clase prog 4 phyton 24 septiembre
+
+los comandos que fui poniendo en cmd para crear el entorno virtual:
+
+python -m venv .venv
+
+.venv\Scripts\activate
+
+pip install "fastapi[standard]"
+
+crear un archivo main.py en el directorio donde iniciamos el entorno virtual
+
+fastapi dev main.py
+
+Sitios: 
+https://restful-api.dev/
